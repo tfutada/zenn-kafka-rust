@@ -16,10 +16,16 @@ async fn main() {
 
     let stream_processor = consumer.stream().try_for_each(|msg| {
         async move {
-            let payload = msg.payload()
-                .and_then(|p| std::str::from_utf8(p).ok())
-                .unwrap_or("[Empty message]");
-            println!("Received message: {}", payload);
+            println!("Received message from topic: {}, partition: {}, offset: {}, timestamp: {:?}",
+                     msg.topic(), msg.partition(), msg.offset(), msg.timestamp());
+
+            tokio::time::sleep(tokio::time::Duration::from_millis(3_000)).await;
+            let r = match msg.payload_view::<str>() {
+                Some(Ok(payload)) => format!("Payload len for {} is {}", payload, payload.len()),
+                Some(Err(_)) => "Message payload is not a string".to_owned(),
+                None => "No payload".to_owned(),
+            };
+            println!("{}", r);
             Ok(())
         }
     });
