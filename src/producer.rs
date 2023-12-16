@@ -13,13 +13,14 @@ async fn main() {
 
     let mut tasks = Vec::new();
 
-    for i in 0..100_000 {
-        let message = format!("Message {}", i);
-        let producer_clone = producer.clone(); // Clone the producer for use in the task
+    for i in 0..100 {
+        let message = "a".repeat(100_000);
+        let producer_clone = producer.clone();
 
         // Spawn a new task for sending each message
         let task = tokio::spawn(async move {
-            let record = FutureRecord::<(), String>::to("my-topic-1")
+            let record = FutureRecord::to("my-topic-1")
+                .key("my-key-1")
                 .payload(&message);
 
             match producer_clone.send(record, Timeout::Never).await {
