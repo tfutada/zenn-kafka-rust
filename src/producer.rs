@@ -1,4 +1,4 @@
-use rdkafka::ClientConfig;
+use rdkafka::config::ClientConfig;
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
 
@@ -10,10 +10,25 @@ async fn main() {
         .create()
         .expect("Producer creation error");
 
-    producer.send(FutureRecord::<(), _>::to("my-topic-1")
-                      .payload("Hello123"), Timeout::Never)
-        .await
-        .expect("Failed to produce");
+    let mut futures = Vec::new();
 
-    println!("Message sent");
+    for i in 0..10 {
+        let message = format!("Message {}", i); // Create the message
+        let future = producer.send(
+            FutureRecord::to("my-topic-1")
+                .payload(&message.clone()), // Clone the message and pass the clone
+            Timeout::Never,
+        );
+        futures.push(future);
+    }
+
+
+    for future in futures {
+        match future.await {
+            Ok(delivery) => println!("Sent: {:?}", delivery),
+            Err((e, _)) => eprintln!("Error: {:?}", e),
+        }
+    }
+
+    println!("Messages sent");
 }
