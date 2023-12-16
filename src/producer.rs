@@ -1,6 +1,7 @@
 use rdkafka::config::ClientConfig;
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
+use tokio; // Ensure you have the tokio runtime available
 
 #[tokio::main]
 async fn main() {
@@ -10,29 +11,30 @@ async fn main() {
         .create()
         .expect("Producer creation error");
 
-    let mut futures = Vec::new();
-    let mut messages = Vec::new(); // Create a vector to store the cloned messages
-    for i in 0..10 {
+    let mut tasks = Vec::new();
+
+    for i in 0..1000 {
         let message = format!("Message {}", i);
-        messages.push(message);
+        let producer_clone = producer.clone(); // Clone the producer for use in the task
+
+        // Spawn a new task for sending each message
+        let task = tokio::spawn(async move {
+            let record = FutureRecord::<(), String>::to("my-topic-1")
+                .payload(&message);
+
+            match producer_clone.send(record, Timeout::Never).await {
+                Ok(delivery) => println!("Sent: {:?}", delivery),
+                Err((e, _)) => eprintln!("Error: {:?}", e),
+            }
+        });
+
+        tasks.push(task);
     }
 
-    for msg in &messages {
-        let future = producer.send(
-            FutureRecord::<(), String>::to("my-topic-1")
-                .payload(msg), // Use the cloned message
-            Timeout::Never,
-        );
-        futures.push(future);
+    // Wait for all tasks to complete
+    for task in tasks {
+        task.await.expect("Task failed to complete");
     }
 
-
-    for future in futures {
-        match future.await {
-            Ok(delivery) => println!("Sent: {:?}", delivery),
-            Err((e, _)) => eprintln!("Error: {:?}", e),
-        }
-    }
-
-    println!("Messages sent");
+    println!("All messages sent");
 }
