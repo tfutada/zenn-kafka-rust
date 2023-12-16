@@ -13,7 +13,7 @@ async fn main() {
 
     let mut tasks = Vec::new();
 
-    for i in 0..100 {
+    for i in 0..1 {
         let message = "a".repeat(100_000);
         let producer_clone = producer.clone();
 
