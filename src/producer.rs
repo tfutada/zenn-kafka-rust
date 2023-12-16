@@ -11,12 +11,16 @@ async fn main() {
         .expect("Producer creation error");
 
     let mut futures = Vec::new();
-
+    let mut messages = Vec::new(); // Create a vector to store the cloned messages
     for i in 0..10 {
-        let message = format!("Message {}", i); // Create the message
+        let message = format!("Message {}", i);
+        messages.push(message);
+    }
+
+    for msg in &messages {
         let future = producer.send(
-            FutureRecord::to("my-topic-1")
-                .payload(&message.clone()), // Clone the message and pass the clone
+            FutureRecord::<(), String>::to("my-topic-1")
+                .payload(msg), // Use the cloned message
             Timeout::Never,
         );
         futures.push(future);
