@@ -40,7 +40,7 @@ async fn main() {
                     // Implement heavy task here
                     println!("Performing heavy task with the message");
                     // For example, processing data, making API calls, etc.
-                    tokio::time::sleep(tokio::time::Duration::from_millis(3_000)).await;
+                    tokio::time::sleep(tokio::time::Duration::from_millis(10_000)).await;
                     println!("Heavy task completed");
                 });
 
