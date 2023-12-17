@@ -22,6 +22,25 @@ async fn main() {
     while let Some(message) = consumer.stream().next().await {
         match message {
             Ok(msg) => {
+                // Accessing the metadata
+                let topic = msg.topic();
+                let partition = msg.partition();
+                let offset = msg.offset();
+                let timestamp = msg.timestamp();
+                let key = msg.key_view::<str>().unwrap();
+
+                // Example of using metadata
+                println!("Received message from topic: {}, partition: {}, offset: {}", topic, partition, offset);
+                if let Ok(key) = key {
+                    println!("Key: {}", key);
+                }
+
+                match timestamp {
+                    rdkafka::message::Timestamp::CreateTime(t) => println!("Created at: {}", t),
+                    rdkafka::message::Timestamp::LogAppendTime(t) => println!("Logged at: {}", t),
+                    rdkafka::message::Timestamp::NotAvailable => println!("Timestamp not available"),
+                }
+
                 // Extract a payload from the message.
                 let tailored_msg = match msg.payload_view::<str>() {
                     Some(Ok(payload)) => {
