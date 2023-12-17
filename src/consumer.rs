@@ -4,12 +4,16 @@ use futures::{StreamExt, TryStreamExt};
 use tokio;
 use std::sync::Arc;
 
+// debug log
+// RUST_LOG=librdkafka=trace,rdkafka::client=debug
 #[tokio::main]
 async fn main() {
+    env_logger::init();
     let consumer = Arc::new(ClientConfig::new()
         .set("bootstrap.servers", "localhost:29092")
         .set("enable.partition.eof", "false")
-        .set("group.id", "my-group-1")
+        .set("debug", "consumer")
+        .set("group.id", "my-group-3")
         .create::<StreamConsumer>()
         .expect("Failed to create client"));
 
