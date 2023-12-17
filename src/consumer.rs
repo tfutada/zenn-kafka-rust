@@ -1,8 +1,9 @@
 use rdkafka::{ClientConfig, Message};
 use rdkafka::consumer::{Consumer, StreamConsumer};
-use futures::{StreamExt, TryStreamExt};
+use futures::{StreamExt};
 use tokio;
 use std::sync::Arc;
+use rdkafka::Timestamp::{CreateTime, LogAppendTime, NotAvailable};
 
 // debug log
 // RUST_LOG=librdkafka=trace,rdkafka::client=debug
@@ -36,9 +37,9 @@ async fn main() {
                 }
 
                 match timestamp {
-                    rdkafka::message::Timestamp::CreateTime(t) => println!("Created at: {}", t),
-                    rdkafka::message::Timestamp::LogAppendTime(t) => println!("Logged at: {}", t),
-                    rdkafka::message::Timestamp::NotAvailable => println!("Timestamp not available"),
+                    CreateTime(t) => println!("Created at: {}", t),
+                    LogAppendTime(t) => println!("Logged at: {}", t),
+                    NotAvailable => println!("Timestamp not available"),
                 }
 
                 // Extract a payload from the message.

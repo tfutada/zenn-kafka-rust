@@ -11,7 +11,7 @@ time = "0.3"
 tokio = { version = "1.35", features = ["rt", "rt-multi-thread", "macros"] }
 futures = "0.3"
 rand = "0.8"
-env_logger = "0.10.1"
+env_logger = "0.10"
 
 [[bin]]
 name = "producer"
