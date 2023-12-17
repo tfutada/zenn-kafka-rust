@@ -32,10 +32,12 @@ async fn main() {
                     println!("process the msg: {}", &tailored_msg[..30]);
                     // For example, run a batch processing, making API calls, etc.
                     tokio::time::sleep(tokio::time::Duration::from_millis(10_000)).await;
-                    println!("Done!");
+                    println!("tokio Done!");
                 });
             }
             Err(e) => eprintln!("Error receiving message: {:?}", e),
         }
     }
+
+    println!("Fine!");
 }
