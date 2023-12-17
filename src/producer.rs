@@ -1,7 +1,7 @@
 use rdkafka::config::ClientConfig;
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
-use tokio; // Ensure you have the tokio runtime available
+use tokio;
 
 #[tokio::main]
 async fn main() {
